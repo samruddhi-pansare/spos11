@@ -1,0 +1,32 @@
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n = 5;
+    string pid[] = {"P1", "P2", "P3", "P4", "P5"};
+    int arrival[] = {0, 2, 4, 6, 8};
+    int burst[]   = {3, 6, 4, 5, 2};
+
+    int start[5], finish[5], waiting[5], turnaround[5];
+
+    start[0] = arrival[0];
+    finish[0] = start[0] + burst[0];
+    turnaround[0] = finish[0] - arrival[0];
+    waiting[0] = turnaround[0] - burst[0];
+
+    for (int i = 1; i < n; i++) {
+        start[i] = max(finish[i-1], arrival[i]);
+        finish[i] = start[i] + burst[i];
+        turnaround[i] = finish[i] - arrival[i];
+        waiting[i] = turnaround[i] - burst[i];
+    }
+
+    cout << "PID\tArrival\tBurst\tStart\tFinish\tWaiting\tTurnaround\n";
+    for (int i = 0; i < n; i++) {
+        cout << pid[i] << "\t" << arrival[i] << "\t" << burst[i] << "\t"
+             << start[i] << "\t" << finish[i] << "\t" 
+             << waiting[i] << "\t" << turnaround[i] << endl;
+    }
+
+    return 0;
+}
