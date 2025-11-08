@@ -1,0 +1,50 @@
+#include <iostream>
+#include <vector>
+#include <set>
+using namespace std;
+
+int main() {
+    int pages[] = {2, 3, 2, 1, 5, 2, 4, 5, 3, 2, 5, 2};
+    int n = sizeof(pages)/sizeof(pages[0]);
+    int frames = 3;
+
+    vector<int> mem;      // current frames
+    int faults = 0;
+
+    for(int i = 0; i < n; i++){
+        int page = pages[i];
+
+        // page already in memory
+        bool found = false;
+        for(int p : mem) if(p == page) { found = true; break; }
+        if(found){
+            cout << "Page " << page << ": ";
+            for(int p : mem) cout << p << " ";
+            cout << endl;
+            continue;
+        }
+
+        faults++;
+        if(mem.size() < frames){
+            mem.push_back(page); // add if space available
+        } else {
+            // find page to replace (used farthest in future)
+            int idx = -1, farthest = -1;
+            for(int j = 0; j < mem.size(); j++){
+                int k;
+                for(k = i+1; k < n; k++)
+                    if(mem[j] == pages[k]) break;
+                if(k > farthest){ farthest = k; idx = j; }
+            }
+            mem[idx] = page; // replace page
+        }
+
+        // print current memory
+        cout << "Page " << page << ": ";
+        for(int p : mem) cout << p << " ";
+        cout << endl;
+    }
+
+    cout << "\nTotal Page Faults: " << faults << endl;
+    return 0;
+}
