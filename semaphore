@@ -1,0 +1,61 @@
+#include <iostream>
+#include <thread>
+#include <semaphore.h>
+#include <chrono>
+using namespace std;
+
+int bufferItem = 0;       // shared resource
+
+sem_t emptySlot;          // semaphore for empty slots
+sem_t fullSlot;           // semaphore for full slots
+sem_t mutexLock;          // binary semaphore for mutual exclusion
+
+void producer() {
+    for (int i = 0; i < 5; i++) {
+        sem_wait(&emptySlot);   // wait for empty slot
+        sem_wait(&mutexLock);   // enter critical section
+
+        bufferItem++;
+        cout << "Produced: " << bufferItem << endl;
+
+        sem_post(&mutexLock);   // exit critical section
+        sem_post(&fullSlot);    // increase count of full slots
+
+        this_thread::sleep_for(chrono::milliseconds(300));
+    }
+}
+
+void consumer() {
+    for (int i = 0; i < 5; i++) {
+        sem_wait(&fullSlot);    // wait for full slot
+        sem_wait(&mutexLock);   // enter critical section
+
+        cout << "Consumed: " << bufferItem << endl;
+        bufferItem--;
+
+        sem_post(&mutexLock);   // exit critical section
+        sem_post(&emptySlot);   // increase empty slots
+
+        this_thread::sleep_for(chrono::milliseconds(500));
+    }
+}
+
+int main() {
+    // initialize semaphores
+    sem_init(&emptySlot, 0, 1);   // 1 empty slot initially
+    sem_init(&fullSlot, 0, 0);    // 0 full slots initially
+    sem_init(&mutexLock, 0, 1);   // binary semaphore for mutual exclusion
+
+    thread prod(producer);
+    thread cons(consumer);
+
+    prod.join();
+    cons.join();
+
+    sem_destroy(&emptySlot);
+    sem_destroy(&fullSlot);
+    sem_destroy(&mutexLock);
+
+    cout << "Done!" << endl;
+    return 0;
+}
