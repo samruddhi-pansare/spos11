@@ -1,0 +1,28 @@
+#include <iostream>
+using namespace std;
+
+int main() {
+    int mem[] = {100, 500, 200, 300, 600};   // memory partitions
+    int proc[] = {212, 417, 112, 426};       // process sizes
+    int n = 5, m = 4;
+
+    cout << "Process\tSize\tAllocated Partition\n";
+
+    for(int i = 0; i < m; i++){
+        int worst = -1;
+        for(int j = 0; j < n; j++){
+            if(mem[j] >= proc[i] && (worst == -1 || mem[j] > mem[worst])) {
+                worst = j; // choose partition with maximum free space
+            }
+        }
+
+        cout << "P" << i+1 << "\t" << proc[i] << "\t";
+        if(worst != -1){
+            cout << "Partition " << worst+1;
+            mem[worst] -= proc[i]; // allocate memory
+        } else cout << "Not Allocated";
+        cout << endl;
+    }
+
+    return 0;
+}
