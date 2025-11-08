@@ -1,0 +1,37 @@
+#include <iostream>
+using namespace std;
+
+int main() {
+    int mem[] = {100, 500, 200, 300, 600};   // memory partitions
+    int proc[] = {212, 417, 112, 426};       // process sizes
+    int n = 5, m = 4;
+
+    int last = 0; // remember last allocated partition index
+
+    cout << "Process\tSize\tAllocated Partition\n";
+
+    for(int i = 0; i < m; i++){
+        int allocated = -1;
+        int j = last;
+        int count = 0;
+
+        // search circularly starting from last allocated partition
+        while(count < n){
+            if(mem[j] >= proc[i]){
+                allocated = j;
+                mem[j] -= proc[i];
+                last = j; // update last allocated
+                break;
+            }
+            j = (j + 1) % n;
+            count++;
+        }
+
+        cout << "P" << i+1 << "\t" << proc[i] << "\t";
+        if(allocated != -1) cout << "Partition " << allocated+1;
+        else cout << "Not Allocated";
+        cout << endl;
+    }
+
+    return 0;
+}
