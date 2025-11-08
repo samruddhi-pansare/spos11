@@ -1,0 +1,46 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+int main() {
+    int pages[] = {2, 3, 2, 1, 5, 2, 4, 5, 3, 2, 5, 2};
+    int n = sizeof(pages)/sizeof(pages[0]);
+    int frames = 3;
+
+    vector<int> mem;        // current pages in memory
+    vector<int> recent;     // track usage order
+    int faults = 0;
+
+    for(int i = 0; i < n; i++){
+        int page = pages[i];
+
+        auto it = find(mem.begin(), mem.end(), page);
+        if(it != mem.end()){
+            // page already in memory, update recent
+            recent.erase(find(recent.begin(), recent.end(), page));
+            recent.push_back(page);
+        } else {
+            // page fault
+            faults++;
+            if(mem.size() < frames){
+                mem.push_back(page);
+            } else {
+                // replace least recently used page
+                int lru = recent.front();
+                int idx = find(mem.begin(), mem.end(), lru) - mem.begin();
+                mem[idx] = page;
+                recent.erase(recent.begin());
+            }
+            recent.push_back(page);
+        }
+
+        // print current memory
+        cout << "Page " << page << ": ";
+        for(int p : mem) cout << p << " ";
+        cout << endl;
+    }
+
+    cout << "\nTotal Page Faults: " << faults << endl;
+    return 0;
+}
