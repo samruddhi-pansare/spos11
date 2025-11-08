@@ -1,0 +1,40 @@
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n = 4;
+    string pid[] = {"P1", "P2", "P3", "P4"};
+    int arrival[] = {0, 0, 2, 3};
+    int burst[]   = {8, 6, 1, 2};
+    int priority[] = {1, 2, 3, 0};  // smaller = higher priority
+
+    int finish[4], wait[4], tat[4], done[4] = {0};
+    int time = 0, completed = 0;
+
+    while (completed < n) {
+        int idx = -1, best = 999;
+        for (int i = 0; i < n; i++) {
+            if (arrival[i] <= time && !done[i] && priority[i] < best) {
+                best = priority[i];
+                idx = i;
+            }
+        }
+
+        if (idx == -1) { time++; continue; }
+
+        time += burst[idx];
+        finish[idx] = time;
+        tat[idx] = finish[idx] - arrival[idx];
+        wait[idx] = tat[idx] - burst[idx];
+        done[idx] = 1;
+        completed++;
+    }
+
+    cout << "PID\tArr\tBurst\tPrio\tFinish\tWait\tTAT\n";
+    for (int i = 0; i < n; i++) {
+        cout << pid[i] << "\t" << arrival[i] << "\t" << burst[i] << "\t"
+             << priority[i] << "\t" << finish[i] << "\t" << wait[i] << "\t" << tat[i] << endl;
+    }
+
+    return 0;
+}
